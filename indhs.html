@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chakravahana - On-Demand Vehicle Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .screen {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+        
+        .screen.active {
+            display: flex;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 20px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #f8f9fa;
+            overflow-y: auto;
+        }
+        
+        .location-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .location-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .location-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .service-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 3px solid transparent;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .service-card.selected {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .service-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .service-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .service-price {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            width: 100%;
+            padding: 15px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .provider-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+        
+        .provider-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .provider-card.selected {
+            border-color: #28a745;
+            background: #f8fff8;
+        }
+        
+        .provider-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .provider-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .provider-details h3 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .rating {
+            color: #ffd700;
+            margin-right: 10px;
+        }
+        
+        .distance {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .provider-price {
+            text-align: right;
+        }
+        
+        .price-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .eta-time {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .selected-indicator {
+            display: none;
+            background: #28a745;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .provider-card.selected .selected-indicator {
+            display: block;
+        }
+        
+        .proceed-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 335px;
+            padding: 18px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .proceed-btn.show {
+            display: block;
+        }
+        
+        .status-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .status-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .status-text {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .eta {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .track-btn {
+            background: #28a745;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Screen -->
+    <div class="phone-container">
+        <div class="screen active" id="home-screen">
+            <div class="header">
+                <div class="logo">Chakravahana</div>
+                <div class="tagline">On-Demand Vehicle Services</div>
+            </div>
+            <div class="content">
+                <div class="location-card">
+                    <h3 style="margin-bottom: 15px; color: #333;">📍 Your Location</h3>
+                    <input type="text" class="location-input" placeholder="Enter your current location" value="Vishakapatanam , Andhra Pradesh">
+                    <button class="btn-secondary" onclick="detectLocation()">📡 Use Current Location</button>
+                </div>
+                
+                <h3 style="margin-bottom: 20px; color: #333;">🔧 Select Service</h3>
+                <div class="services-grid">
+                    <div class="service-card" onclick="selectService(this, 'Puncture Repair')">
+                        <div class="service-icon">🛞</div>
+                        <div class="service-name">Puncture Repair</div>
+                        <div class="service-price">₹150-300</div>
+                    </div>
+                    <div class="service-card" onclick="selectService(this, 'Oil Change')">
+                        <div class="service-icon">🛢️</div>
+                        <div class="service-name">Oil Change</div>
+                        <div class="service-price">₹500-1200</div>
+                    </div>
+                    <div class="service-card" onclick="selectService(this, 'Battery Service')">
+                        <div class="service-icon">🔋</div>
+                        <div class="service-name">Battery Service</div>
+                        <div class="service-price">₹200-500</div>
+                    </div>
+                    <div class="service-card" onclick="selectService(this, 'Vehicle Wash')">
+                        <div class="service-icon">🧽</div>
+                        <div class="service-name">Vehicle Wash</div>
+                        <div class="service-price">₹100-250</div>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="findProviders()" id="find-btn" disabled>
+                    Find Service Providers
+                </button>
+            </div>
+        </div>
+        
+        <!-- Service Providers Screen -->
+        <div class="screen" id="providers-screen">
+            <div class="header">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <div class="logo">Available Providers</div>
+                <div class="tagline">Tap to select your provider</div>
+            </div>
+            <div class="content">
+                <div class="provider-card" onclick="selectProvider(this, 'Rama krishna', '₹200', '15 mins')">
+                    <div class="provider-info">
+                        <div class="provider-avatar">R</div>
+                        <div class="provider-details">
+                            <h3>Rama krishna</h3>
+                            <div>
+                                <span class="rating">⭐ 4.8</span>
+                                <span class="distance">2.3 km away</span>
+                            </div>
+                            <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                                Puncture Specialist • 5 years exp
+                            </div>
+                        </div>
+                    </div>
+                    <div class="provider-price">
+                        <div class="price-amount">₹200</div>
+                        <div class="eta-time">ETA: 15 mins</div>
+                    </div>
+                    <div class="selected-indicator">✅ SELECTED</div>
+                </div>
+                
+                <div class="provider-card" onclick="selectProvider(this, 'Bushana rao ', '₹250', '20 mins')">
+                    <div class="provider-info">
+                        <div class="provider-avatar">A</div>
+                        <div class="provider-details">
+                            <h3>Bushana rao</h3>
+                            <div>
+                                <span class="rating">⭐ 4.6</span>
+                                <span class="distance">3.1 km away</span>
+                            </div>
+                            <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                                Multi-Service • 7 years exp
+                            </div>
+                        </div>
+                    </div>
+                    <div class="provider-price">
+                        <div class="price-amount">₹250</div>
+                        <div class="eta-time">ETA: 20 mins</div>
+                    </div>
+                    <div class="selected-indicator">✅ SELECTED</div>
+                </div>
+                
+                <div class="provider-card" onclick="selectProvider(this, 'Harsha', '₹300', '12 mins')">
+                    <div class="provider-info">
+                        <div class="provider-avatar">V</div>
+                        <div class="provider-details">
+                            <h3>Harsha</h3>
+                            <div>
+                                <span class="rating">⭐ 4.9</span>
+                                <span class="distance">1.8 km away</span>
+                            </div>
+                            <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                                Premium Service • 10 years exp
+                            </div>
+                        </div>
+                    </div>
+                    <div class="provider-price">
+                        <div class="price-amount">₹300</div>
+                        <div class="eta-time">ETA: 12 mins</div>
+                    </div>
+                    <div class="selected-indicator">✅ SELECTED</div>
+                </div>
+            </div>
+            <button class="proceed-btn" onclick="proceedToBooking()">
+                Book Selected Provider
+            </button>
+        </div>
+        
+        <!-- Booking Confirmation Screen -->
+        <div class="screen" id="booking-screen">
+            <div class="header">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <div class="logo">Confirm Booking</div>
+                <div class="tagline">Review your service request</div>
+            </div>
+            <div class="content">
+                <div class="status-card">
+                    <div class="status-icon">✅</div>
+                    <div class="status-text">Booking Confirmed!</div>
+                    <div style="color: #666; margin: 15px 0; text-align: left;">
+                        <div style="margin-bottom: 8px;"><strong>Service:</strong> <span id="selected-service">Puncture Repair</span></div>
+                        <div style="margin-bottom: 8px;"><strong>Provider:</strong> <span id="selected-provider">Rama krishna</span></div>
+                        <div style="margin-bottom: 8px;"><strong>Location:</strong> Vishakapatanam , Andhra Pradesh</div>
+                        <div style="margin-bottom: 8px;"><strong>Price:</strong> <span id="selected-price">₹200</span></div>
+                    </div>
+                    <div class="eta" id="booking-eta">Arriving in 15 minutes</div>
+                    <button class="btn-primary track-btn" onclick="showScreen('tracking-screen')">
+                        Track Service Provider
+                    </button>
+                </div>
+                
+                <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom: 15px; color: #333;">📱 Contact Provider</h3>
+                    <button class="btn-secondary" style="margin-bottom: 10px;">📞 Call Provider</button>
+                    <button class="btn-secondary" style="margin-top: 0;">💬 Send Message</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tracking Screen -->
+        <div class="screen" id="tracking-screen">
+            <div class="header">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <div class="logo">Live Tracking</div>
+                <div class="tagline">Your provider is on the way</div>
+            </div>
+            <div class="content">
+                <div class="status-card">
+                    <div class="status-icon">🚗</div>
+                    <div class="status-text">Provider is heading to you</div>
+                    <div class="eta">ETA: 8 minutes</div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 10px;">Live Location</div>
+                        <div style="background: #667eea; height: 200px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px;">
+                            🗺️ Live Map View<br>
+                            <small style="margin-top: 10px;">Provider location updating...</small>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-secondary" style="flex: 1; margin: 0;">📞 Call</button>
+                        <button class="btn-secondary" style="flex: 1; margin: 0;">💬 Message</button>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="showScreen('completion-screen')" style="margin-top: 15px;">
+                        ✅ Mark as Completed
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Completion Screen -->
+        <div class="screen" id="completion-screen">
+            <div class="header">
+                <div class="logo">Service Completed</div>
+                <div class="tagline">Thank you for using Chakravahana!</div>
+            </div>
+            <div class="content">
+                <div class="status-card">
+                    <div class="status-icon">🎉</div>
+                    <div class="status-text">Service Successfully Completed!</div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: left;">
+                        <h3 style="margin-bottom: 15px; color: #333;">📄 Service Summary</h3>
+                        <div style="margin-bottom: 10px;"><strong>Service:</strong> <span id="final-service">Puncture Repair</span></div>
+                        <div style="margin-bottom: 10px;"><strong>Provider:</strong> <span id="final-provider">Rama krishna</span></div>
+                        <div style="margin-bottom: 10px;"><strong>Duration:</strong> 25 minutes</div>
+                        <div style="margin-bottom: 10px;"><strong>Total Paid:</strong> <span id="final-price">₹200</span></div>
+                        <div><strong>Payment:</strong> UPI/Card ✅</div>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                        <h3 style="margin-bottom: 15px; color: #333;">⭐ Rate Your Experience</h3>
+                        <div style="font-size: 30px; text-align: center; margin: 15px 0;">
+                            <span onclick="rate(1)" style="cursor: pointer;">⭐</span>
+                            <span onclick="rate(2)" style="cursor: pointer;">⭐</span>
+                            <span onclick="rate(3)" style="cursor: pointer;">⭐</span>
+                            <span onclick="rate(4)" style="cursor: pointer;">⭐</span>
+                            <span onclick="rate(5)" style="cursor: pointer;">⭐</span>
+                        </div>
+                        <textarea placeholder="Write your feedback..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; resize: none;" rows="3"></textarea>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="bookAgain()">
+                        🔧 Book Another Service
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedService = '';
+        let selectedProvider = '';
+        let selectedPrice = '';
+        let selectedEta = '';
+        let currentScreen = 'home-screen';
+        let screenHistory = [];
+        
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show target screen
+            document.getElementById(screenId).classList.add('active');
+            
+            // Update history
+            if (currentScreen !== screenId) {
+                screenHistory.push(currentScreen);
+                currentScreen = screenId;
+            }
+            
+            // Hide proceed button when not on providers screen
+            const proceedBtn = document.querySelector('.proceed-btn');
+            if (screenId !== 'providers-screen') {
+                proceedBtn.classList.remove('show');
+            }
+        }
+        
+        function goBack() {
+            if (screenHistory.length > 0) {
+                const previousScreen = screenHistory.pop();
+                currentScreen = previousScreen;
+                showScreen(previousScreen);
+            }
+        }
+        
+        function selectService(element, service) {
+            // Remove selection from all services
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select clicked service
+            element.classList.add('selected');
+            selectedService = service;
+            
+            // Enable find button
+            const findBtn = document.getElementById('find-btn');
+            findBtn.disabled = false;
+            findBtn.style.opacity = '1';
+        }
+        
+        function detectLocation() {
+            alert('📍 Location detected: Using your current location');
+        }
+        
+        function findProviders() {
+            if (!selectedService) {
+                alert('Please select a service first');
+                return;
+            }
+            showScreen('providers-screen');
+        }
+        
+        function selectProvider(element, providerName, price, eta) {
+            // Remove selection from all providers
+            document.querySelectorAll('.provider-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select clicked provider
+            element.classList.add('selected');
+            selectedProvider = providerName;
+            selectedPrice = price;
+            selectedEta = eta;
+            
+            // Show proceed button
+            const proceedBtn = document.querySelector('.proceed-btn');
+            proceedBtn.classList.add('show');
+        }
+        
+        function proceedToBooking() {
+            if (!selectedProvider) {
+                alert('Please select a provider first');
+                return;
+            }
+            
+            // Update booking screen with selection details
+            document.getElementById('selected-service').textContent = selectedService;
+            document.getElementById('selected-provider').textContent = selectedProvider;
+            document.getElementById('selected-price').textContent = selectedPrice;
+            document.getElementById('booking-eta').textContent = 'Arriving in ' + selectedEta.replace(' mins', ' minutes');
+            
+            // Update completion screen details too
+            document.getElementById('final-service').textContent = selectedService;
+            document.getElementById('final-provider').textContent = selectedProvider;
+            document.getElementById('final-price').textContent = selectedPrice;
+            
+            showScreen('booking-screen');
+        }
+        
+        function rate(stars) {
+            alert(`You rated ${stars} stars! Thank you for your feedback.`);
+        }
+        
+        function bookAgain() {
+            // Reset all selections
+            selectedService = '';
+            selectedProvider = '';
+            selectedPrice = '';
+            selectedEta = '';
+            screenHistory = [];
+            currentScreen = 'home-screen';
+            
+            // Reset UI
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelectorAll('.provider-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const findBtn = document.getElementById('find-btn');
+            findBtn.disabled = true;
+            findBtn.style.opacity = '0.5';
+            
+            const proceedBtn = document.querySelector('.proceed-btn');
+            proceedBtn.classList.remove('show');
+            
+            showScreen('home-screen');
+        }
+    </script>
+</body>
+</html>
